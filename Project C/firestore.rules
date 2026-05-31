@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global safety net - default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Secure authentication & ownership primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isDev() {
+      return isSignedIn() && (
+        request.auth.uid == 'BS3htAuD5GdbUXawqniaiuY0clR2' ||
+        (request.auth.token != null && 'email' in request.auth.token && request.auth.token.email == 'saikatdhara91@gmail.com')
+      );
+    }
+
+    // Users Collection with strict PII protection
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isDev();
+      allow create, update: if isOwner(userId) || isDev();
+      allow list, delete: if isDev();
+    }
+
+    // Appointments Collection
+    match /appointments/{appointmentId} {
+      // Allow gets and lists ONLY for matching owners or the admin / developer account
+      allow get, list: if isSignedIn() && (resource.data.patientUserId == request.auth.uid || isDev());
+
+      // Allow creating an appointment for themselves only
+      allow create: if isSignedIn() && request.resource.data.patientUserId == request.auth.uid;
+
+      // Allow updates if the user is the owner (cancelling their own appointment) or the admin/developer
+      allow update: if isSignedIn() && (resource.data.patientUserId == request.auth.uid || isDev());
+
+      allow delete: if isDev();
+    }
+
+    // Test Collection for Connection Verification
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+  }
+}

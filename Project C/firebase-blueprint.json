@@ -1,0 +1,59 @@
+{
+  "entities": {
+    "user": {
+      "title": "User",
+      "description": "Patient user profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "dob": { "type": "string" },
+        "bloodGroup": { "type": "string" },
+        "gender": { "type": "string" },
+        "medicalHistory": { "type": "string" },
+        "emergencyContact": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "email"]
+    },
+    "appointment": {
+      "title": "Appointment",
+      "description": "Healthcare booking",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "patientUserId": { "type": "string" },
+        "hospitalId": { "type": "string" },
+        "hospitalName": { "type": "string" },
+        "type": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "itemName": { "type": "string" },
+        "doctorId": { "type": "string" },
+        "doctorName": { "type": "string" },
+        "patientName": { "type": "string" },
+        "patientAge": { "type": "number" },
+        "patientGender": { "type": "string" },
+        "docSpecialty": { "type": "string" },
+        "notes": { "type": "string" },
+        "bedId": { "type": "string" },
+        "wardId": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "patientUserId", "hospitalId", "type", "date", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "user",
+      "description": "User profiles"
+    },
+    "/appointments/{appointmentId}": {
+      "schema": "appointment",
+      "description": "Appointment bookings"
+    }
+  }
+}
